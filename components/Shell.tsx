@@ -1,0 +1,1 @@
+import Sidebar from './Sidebar';export default function Shell({title,subtitle,children,action}:{title:string,subtitle?:string,children:React.ReactNode,action?:React.ReactNode}){return <div className="app"><Sidebar/><main><header className="top"><div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div>{action}</header>{children}</main></div>}

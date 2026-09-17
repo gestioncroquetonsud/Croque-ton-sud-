@@ -1,0 +1,1 @@
+import Link from 'next/link';export default function StatCard({label,value,note,accent='yellow',href='#'}:{label:string,value:string|number,note?:string,accent?:string,href?:string}){return <Link href={href} className={`stat ${accent}`}><span>{label}</span><strong>{value}</strong>{note&&<small>{note}</small>}</Link>}
