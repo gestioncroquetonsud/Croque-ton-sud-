@@ -207,3 +207,61 @@ export default function Dashboard() {
 
             <a href="/guides">Gérer les guides</a>
           </div>
+                    {['Toulon', 'Hyères', 'La Londe-les-Maures'].map((city) => (
+            <div className="guideStatus" key={city}>
+              <div className="guideCity">
+                <Languages size={15} />
+                <strong>{city}</strong>
+              </div>
+
+              <span className="lang on">FR</span>
+              <span className="lang">EN</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="panel">
+          <div className="panelhead">
+            <div>
+              <span className="miniEyebrow orangeText">RACCOURCIS</span>
+              <h2>Actions rapides</h2>
+              <p>Accédez aux tâches les plus fréquentes</p>
+            </div>
+          </div>
+
+          <div className="quickActions dashQuick">
+            <a href="/clients">
+              <Building2 />
+              Conciergerie
+            </a>
+
+            <a href="/logements">
+              <House />
+              Logement
+            </a>
+
+            <a href="/qr-codes">
+              <QrCode />
+              QR Codes
+            </a>
+
+            <a href="/guides">
+              <FileText />
+              Guide PDF
+            </a>
+
+            <a href="/establishments">
+              <Store />
+              Établissement
+            </a>
+
+            <a href="/alerts">
+              <Bell />
+              Alertes
+            </a>
+          </div>
+        </div>
+      </section>
+    </Shell>
+  )
+}
