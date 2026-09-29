@@ -31,7 +31,7 @@ Deno.serve(async req=>{
       const start=new Date(); start.setUTCDate(1); start.setUTCHours(0,0,0,0)
       const {count}=await sb.from('scan_events').select('*',{count:'exact',head:true}).eq('qr_code_id',q.id).gte('scanned_at',start.toISOString())
       const threshold=q.monthly_threshold||50, warning=Math.ceil(threshold*((q.warning_percent||80)/100)), scans=count||0
-      if(scans>=warning){if(scans>=warning){
+      if(scans>=warning){
   const isCritical = scans >= threshold
   const alertType = isCritical
     ? 'scan_threshold_critical'
