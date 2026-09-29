@@ -31,11 +31,58 @@ Deno.serve(async req=>{
       const start=new Date(); start.setUTCDate(1); start.setUTCHours(0,0,0,0)
       const {count}=await sb.from('scan_events').select('*',{count:'exact',head:true}).eq('qr_code_id',q.id).gte('scanned_at',start.toISOString())
       const threshold=q.monthly_threshold||50, warning=Math.ceil(threshold*((q.warning_percent||80)/100)), scans=count||0
-      if(scans>=warning){
-        const level=scans>=threshold?'critical':'watch';
-        const {data:existing}=await sb.from('alerts').select('id').eq('qr_code_id',q.id).eq('status','open').eq('type','scan_threshold').maybeSingle()
-        if(!existing) await sb.from('alerts').insert({qr_code_id:q.id,type:'scan_threshold',message:`${level==='critical'?'Seuil mensuel atteint':'QR à surveiller'} : ${scans}/${threshold} scans`})
-      }
+      if(scans>=warning){if(scans>=warning){
+  const isCritical = scans >= threshold
+  const alertType = isCritical
+    ? 'scan_threshold_critical'
+    : 'scan_threshold_warning'
+
+  const message = isCritical
+    ? `Seuil mensuel atteint : ${scans}/${threshold} scans`
+    : `QR à surveiller : ${scans}/${threshold} scans`
+
+  const {data:existing}=await sb
+    .from('alerts')
+    .select('id,type')
+    .eq('qr_code_id',q.id)
+    .eq('status','open')
+    .in('type',['scan_threshold_warning','scan_threshold_critical'])
+
+  const openAlerts = existing || []
+  const criticalAlert = openAlerts.find(
+    (alert:any)=>alert.type==='scan_threshold_critical'
+  )
+  const warningAlert = openAlerts.find(
+    (alert:any)=>alert.type==='scan_threshold_warning'
+  )
+
+  if(isCritical){
+    if(warningAlert){
+      await sb
+        .from('alerts')
+        .update({
+          type:'scan_threshold_critical',
+          message
+        })
+        .eq('id',warningAlert.id)
+    }else if(!criticalAlert){
+      await sb
+        .from('alerts')
+        .insert({
+          qr_code_id:q.id,
+          type:alertType,
+          message
+        })
+    }
+  }else if(!warningAlert && !criticalAlert){
+    await sb
+      .from('alerts')
+      .insert({
+        qr_code_id:q.id,
+        type:alertType,
+        message
+      })
+  }
       return json({session_id:sessionId,property:{label:p.label},cities})
     }
     if(action==='guide'){
